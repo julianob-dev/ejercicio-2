@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -64,25 +65,33 @@ func main() {
 	}
 
 	var sectorMap = make(map[string]*Sector)
-
+	var sectorId int = 1
+	var especialidadId int = 1
 	for _, row := range lines[1:] {
+		esp := Especialidad{
+			Id: especialidadId,
+			Nombre: row[1],
+		}
+		especialidadId++
+		
+		// Añado la especialidad al sector si lo encuentro y continuo con la siguiente linea
 		if v, ok := sectorMap[row[0]]; ok {
-			esp := Especialidad{
-				Id: 1,
-				Nombre: row[1],
-			}
 			v.Especialidades = append(v.Especialidades, esp)
 			continue
 		}
+		
+		//si no existe creo el sector y lo agrego al mapa
 		sector := Sector{
-			Id: 1,
+			Id: sectorId,
 			Nombre: row[0],
-			Especialidades: []Especialidad{},
+			Especialidades: append([]Especialidad{}, esp),
 		}
 
 		sectorMap[row[0]] = &sector
+		sectorId++
 	}
 
-	fmt.Println(sectorMap)
-	fmt.Println(sectorMap["ALMACENES"])
+	for _, v := range sectorMap {
+		log.Printf("%v\n", v)
+	}
 }
